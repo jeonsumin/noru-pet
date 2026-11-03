@@ -1,0 +1,28 @@
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./backoffice:/var/www/html
+      - ./infra/apache.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASS: brightb8426@
+      DB_NAME: NORU_PAT
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.4
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: NORU_PAT
+      MYSQL_ROOT_PASSWORD: brightb8426@
+    volumes:
+      - ./infra/db:/var/lib/mysql
+      - ./infra/init:/docker-entrypoint-initdb.d:ro
+

@@ -70,7 +70,7 @@ if( strlen( $self ) == 0 ) $self = $_SERVER['PHP_SELF'];
 
 $action_param = array( 'ipaddr'=>$ipaddr, 'referer'=>$ref_url, 'ref'=>$ref, 'self'=> $self, 'param'=>$query_string );
 
-$root_f = "api";
+$root_f = "";
 include_once realpath($_SERVER["DOCUMENT_ROOT"]."")."/".$root_f."/lib/config.php";
 include_once realpath($_SERVER["DOCUMENT_ROOT"]."")."/".$root_f."/lib/config.db.php";
 include_once realpath($_SERVER["DOCUMENT_ROOT"]."")."/".$root_f."/lib/function.php";

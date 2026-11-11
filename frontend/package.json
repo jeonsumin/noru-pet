@@ -22,9 +22,12 @@
     "@reduxjs/toolkit": "^2.13.0",
     "auto-launch": "^5.0.6",
     "axios": "^1.21.0",
+    "clsx": "^2.1.1",
     "concurrently": "^10.0.6",
     "cross-env": "^10.1.0",
+    "lottie-web": "^5.13.0",
     "react": "^19.3.1",
+    "react-cookie": "^8.1.2",
     "react-dom": "^19.3.1",
     "react-redux": "^9.3.1",
     "react-router-dom": "^7.18.5",
@@ -56,7 +59,7 @@
       "src/assets/img/app_icon.ico"
     ],
     "win": {
-      "icon": "src/assets/img/app_icon.ico"
+      "icon": "public/favicon_256x256.png"
     },
     "directories": {
       "buildResources": "resources"

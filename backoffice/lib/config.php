@@ -25,6 +25,7 @@ $BB_DATE = date('YmdHis');
 
 $today = date('Y-m-d');
 $BB_IPADDR = $_SERVER['REMOTE_ADDR'];
+$zx = '';
 
 if( isset($zx) ){ define("IS_DEBUG", true); }else{ define("IS_DEBUG", false); }
 ?>

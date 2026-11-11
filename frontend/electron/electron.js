@@ -11,7 +11,7 @@ let mainWindow;
 const AutoLaunch = require('auto-launch');
 
 const autoLauncher = new AutoLaunch({
-  name: 'stampearth_beam', // 앱 이름으로 변경
+  name: 'noru_pet', // 앱 이름으로 변경
 
   path: app.getPath('exe'), // 실행 파일 경로
 });
@@ -65,7 +65,7 @@ async function createWindow() {
   try {
     if (isDev) {
       // 개발 환경: Vite 개발 서버에 연결
-      await mainWindow.loadURL('http://localhost:3000/');
+      await mainWindow.loadURL('http://localhost:3001');
       // 개발자 도구 자동 열기
       mainWindow.webContents.openDevTools();
     } else {

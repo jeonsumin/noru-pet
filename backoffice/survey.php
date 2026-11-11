@@ -1,32 +1,25 @@
 <?php
     include_once('./_common.php');
 
-    if($zx == 'y'){ // 테스트 일때
-        $Q1 = "A";
-        $Q2 = "A";
-        $Q3 = "D";
-        $Q4 = "C";
-    } else { // 테스트 아닐때
-        $json_data = file_get_contents('php://input');
-        $data = json_decode($json_data, true);
-        $Q1 = $data["Q1"];
-        $Q2 = $data["Q2"];
-        $Q3 = $data["Q3"];
-        $Q4 = $data["Q4"];
-
+    if($zx == 'y'){
+        $data = array("Q1" => "A", "Q2" => "A", "Q3" => "D", "Q4" => "C", "ChannelType" => "WEB", "Result" => "");
+    } else {
+        $data = json_decode(file_get_contents('php://input'), true) ?: array();
     }
 
+    $id = (int)($data["ID"] ?? 0);
 
-$insert_sql = "INSERT INTO surveyList SET ";
-$insert_sql .= "Q1 = '". $Q1 . "' ";
-$insert_sql .= ", Q2 = '". $Q2. "' ";
-$insert_sql .= ", Q3 = '". $Q3. "' ";
-$insert_sql .= ", Q4 = '". $Q4. "' ";
+    $set_sql = "";
+    foreach (array("Q1", "Q2", "Q3", "Q4", "ChannelType", "Result") as $key) {
+        $set_sql .= ($set_sql ? ", " : "") . $key . " = '" . ESC($data[$key] ?? "", $DB) . "'";
+    }
 
+    if ($id > 0) {
+        rf_mysql_query("UPDATE surveyList SET " . $set_sql . " WHERE ID = " . $id, $DB);
+    } else {
+        rf_mysql_query("INSERT INTO surveyList SET " . $set_sql, $DB);
+        $id = mysqli_insert_id($DB);
+    }
 
-debug($insert_sql);
-
-rf_mysql_query($insert_sql , $DB);
-
-echo "ok";
-
+    header("Content-Type: application/json");
+    echo json_encode(array("ID" => $id));

@@ -224,3 +224,52 @@
 		} while ($certCodeCnt > 0);
 		return $code;
 	}
+
+    function php_alert($msg, $mode = "")
+    {
+
+        echo "<script>alert('" . $msg . "');</script>";
+
+        if ($mode == "back") {
+            php_history_back();
+        } else if ($mode != "back" && $mode != "") {
+            php_location($mode);
+        }
+        exit;
+    }
+
+
+    function php_location($url)
+    {
+        echo "<script>document.location.href='" . $url . "';</script>";
+    }
+
+    function goto_url($url)
+    {
+        $url = str_replace("&amp;", "&", $url);
+        //echo "<script> location.replace('$url'); </script>";
+
+        if (!headers_sent())
+            header('Location: ' . $url);
+        else {
+            echo '<script>';
+            echo 'location.href = "' . $url . '";';
+            echo '</script>';
+            echo '<noscript>';
+            echo '<meta http-equiv="refresh" content="0;url=' . $url . '" />';
+            echo '</noscript>';
+        }
+        exit;
+    }
+
+
+    // 세션변수 생성
+    function set_session($session_name, $value)
+    {
+        if (PHP_VERSION < '5.3.0')
+                session_register($session_name);
+            // PHP 버전별 차이를 없애기 위한 방
+        $_SESSION[$session_name] = $value;
+    }
+
+

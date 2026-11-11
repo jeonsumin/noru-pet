@@ -16,12 +16,18 @@
 
     }
 
+$today = _BB_TIME_YMDHIS;
+
+$uid = useruid($DB, 'surveyList', 'USER_CD');
 
 $insert_sql = "INSERT INTO surveyList SET ";
-$insert_sql .= "Q1 = '". $Q1 . "' ";
+$insert_sql .= "USER_CD = '". $uid . "' ";
+$insert_sql .= ", Q1 = '". $Q1 . "' ";
 $insert_sql .= ", Q2 = '". $Q2. "' ";
 $insert_sql .= ", Q3 = '". $Q3. "' ";
 $insert_sql .= ", Q4 = '". $Q4. "' ";
+$insert_sql .= ", REG_DT = '". $today. "' ";
+
 
 
 debug($insert_sql);

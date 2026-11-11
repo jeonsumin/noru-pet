@@ -61,6 +61,7 @@ $self = 0;
 $ref = 0;
 $path = '..';
 
+
 if(preg_match($mobile_agent, $_SERVER['HTTP_USER_AGENT'])) $device = 'M';
 if( strlen( $ipaddr ) == 0 ) $ipaddr = $_SERVER["REMOTE_ADDR"];
 if( strlen( $ref_url ) == 0 ) $ref_url = $_SERVER["HTTP_REFERER"];

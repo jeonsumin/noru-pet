@@ -7,7 +7,8 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  base:'./',
+  // BrowserRouter: 상대경로면 /a/b 같은 깊은 경로에서 assets 404
+  base: process.env.ELECTRON ? './' : '/',
   server: {
     port: 3000,
   },

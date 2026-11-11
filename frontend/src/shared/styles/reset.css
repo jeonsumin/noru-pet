@@ -1,0 +1,216 @@
+/* ==========================================================================
+   1. Global Settings & Box Sizing
+   ========================================================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box; /* 패딩/테두리 포함 크기 계산 */
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    border-style: solid;
+    border-color: theme("borderColor.DEFAULT", currentColor); /* Tailwind 호환 고려 */
+    user-select: none;
+    -webkit-tap-highlight-color: transparent; /* 터치 하이라이트 제거 (회색 배경) */
+    -webkit-touch-callout: none; /* iOS 길게 누르기 메뉴 제거 */
+    -webkit-user-drag: none; /* 이미지 드래그 방지 */
+}
+
+/* ==========================================================================
+   2. HTML & Body Defaults
+   ========================================================================== */
+html {
+    line-height: 1.5; /* 가독성 좋은 기본 행간 */
+    -webkit-text-size-adjust: 100%; /* 모바일 가로모드 폰트 뻥튀기 방지 */
+    -moz-tab-size: 4; /* 코드 블록 탭 사이즈 통일 */
+    tab-size: 4;
+    font-family: Pretendard, sans-serif;
+    scroll-behavior: smooth; /* 스크롤 부드럽게 */
+    font-synthesis: none;
+    -webkit-text-size-adjust: none; /* 사파리, 크롬 (iOS) */
+    -ms-text-size-adjust: none; /* Internet Explorer */
+    -moz-text-size-adjust: none; /* Firefox */
+    -o-text-size-adjust: none; /* Opera */
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* React Root 꽉 채우기 */
+#root {
+    isolation: isolate; /* z-index 스택 컨텍스트 분리 */
+    width: 100%;
+    height: 100%;
+}
+
+/* ==========================================================================
+   3. Typography Reset
+   ========================================================================== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: inherit; /* 제목 태그의 굵기/크기 초기화 -> 직접 스타일링 유도 */
+    font-weight: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    background-color: transparent; /* 구형 브라우저 대응 */
+}
+
+/* 텍스트 줄바꿈 개선 */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    overflow-wrap: break-word;
+}
+
+/* ==========================================================================
+   4. Media Elements (Responsive)
+   ========================================================================== */
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+    display: block; /* 인라인 요소 하단 여백 제거 */
+    max-width: 100%; /* 부모 뚫고 나가는 것 방지 */
+}
+
+img,
+video {
+    height: auto; /* 비율 유지 */
+}
+
+/* 아이콘 위치 잡기 편하게 */
+svg {
+    vertical-align: middle;
+}
+
+/* ==========================================================================
+   5. List & Tables
+   ========================================================================== */
+ul,
+ol,
+menu {
+    list-style: none;
+}
+
+table {
+    border-collapse: collapse; /* 테두리 겹침 방지 */
+    border-spacing: 0;
+    width: 100%; /* 테이블 기본 꽉 차게 */
+}
+
+/* ==========================================================================
+   6. Form Elements (Hard Reset)
+   ★ 가장 까다로운 부분입니다. 브라우저 기본 스타일을 완전히 벗겨냅니다.
+   ========================================================================== */
+input,
+button,
+textarea,
+select,
+optgroup {
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    background-color: transparent;
+    border: none; /* 기본 테두리 제거 */
+    border-radius: 0; /* iOS 둥근 모서리 제거 */
+    box-shadow: none;
+    appearance: none; /* 네이티브 UI 제거 (특히 모바일) */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+}
+
+/* 버튼 클릭 커서 */
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+    cursor: pointer;
+    background-image: none; /* 구형 브라우저 그라데이션 제거 */
+}
+
+/* 비활성화 요소 커서 처리 */
+button:disabled,
+input:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 텍스트박스 크기 조절 수직으로만 제한 (레이아웃 깨짐 방지) */
+textarea {
+    resize: vertical;
+}
+
+/* input[type="number"] 스피너 제거 (디자인 방해 요소) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* 검색창 X 버튼 제거 (커스텀 디자인 위해) */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+}
+
+/* 포커스 시 접근성 유지 (키보드 사용자 배려) */
+:focus-visible {
+    outline: 2px solid #000; /* 혹은 브랜드 컬러 */
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   7. Utilities & Accessibility
+   ========================================================================== */
+/* 화면엔 안 보이지만 스크린리더는 읽을 수 있게 (웹 접근성 필수) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* [hidden] 속성 강제 적용 */
+[hidden] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   8. Animation (User Preference)
+   사용자가 '동작 줄이기' 설정 시 애니메이션 끄기
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

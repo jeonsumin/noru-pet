@@ -1,16 +1,19 @@
 import clsx from 'clsx';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { images } from 'shared/images';
+import { isKiosk } from 'shared/isKiosk';
 import { Popup } from 'shared/ui/Popup';
+
+const confirmPaths = isKiosk ? ['/quest', '/type_result', '/presc'] : ['/quest', '/type_result'];
 
 export interface HeaderProps {
   title?: string;
   type?: 'main' | 'quest' | 'analyze';
-  hideHome?: boolean;
 }
-export const Header = ({title, type, hideHome}:HeaderProps) => {
+export const Header = ({title, type}:HeaderProps) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
@@ -20,8 +23,8 @@ export const Header = ({title, type, hideHome}:HeaderProps) => {
           <img src={images.logo} alt='logo' />
           {title && <div className='logo_title'>{title}</div>}
         </div>
-        {type === 'quest' && !hideHome && (
-          <button type='button' className='hd_button' onClick={() => setConfirmOpen(true)}>
+        {type === 'quest' && (
+          <button type='button' className='hd_button' onClick={() => (confirmPaths.includes(pathname) ? setConfirmOpen(true) : navigate('/'))}>
             처음으로
           </button>
         )}

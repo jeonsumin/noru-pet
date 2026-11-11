@@ -405,7 +405,7 @@ footer.line {
     height:100%;
     border-radius:inherit;
     background-color:var(--color2);
-    animation:analyze_fill 2.5s linear forwards;
+    animation:analyze_fill 1.5s linear forwards;
 }
 @keyframes analyze_fill {
     to { width:100%; }
@@ -1108,6 +1108,7 @@ footer.line {
         margin-top:8px;
         padding:20px;
         border-width:1px;
+        border-radius: 16px;
     }
     .result_goods_box.mo_only > img {
         max-width:128px;
@@ -1129,6 +1130,7 @@ footer.line {
         padding:5px 8px;
         font-size:10px;
         line-height: 140%;
+        border-radius: 4px;
     }
     .result_goods_sale > div {
         gap:3px;

@@ -1,5 +1,4 @@
 import { Footer } from 'shared/ui/Footer';
-import { useTypeCookie } from 'shared/hooks/useTypeCookie';
 import { useResultType } from 'shared/hooks/useResultType';
 import { useIsMobile } from 'shared/hooks/useIsMobile';
 import { useSearchParams } from 'react-router-dom';
@@ -10,8 +9,6 @@ export const PrescScreen = () => {
     const { type, popup } = useResultType();
     const isMobile = useIsMobile();
     const [params] = useSearchParams();
-    const { cookie } = useTypeCookie();
-    const hasCookie = /^[1-8]$/.test(String(cookie.type));
     if (type === null) return popup;
     const prescItem = presc[type];
 
@@ -61,16 +58,14 @@ export const PrescScreen = () => {
                     </div>
                 </section>
             </main>
-            {!hasCookie && (
-                <Footer
-                    line
-                    button={
-                        isMobile
-                            ? { text: '처음으로', to: '/' }
-                            : { text: '리워드 받기', arrow: true, to: '/result', keepParams: true }
-                    }
-                />
-            )}
+            <Footer
+                line
+                button={
+                    isMobile
+                        ? { text: '처음으로', to: '/' }
+                        : { text: '리워드 받기', arrow: true, to: '/result', keepParams: true }
+                }
+            />
         </>
     );
 }

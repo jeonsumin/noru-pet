@@ -1,7 +1,15 @@
-import { Routes, Route, Outlet, Navigate, useNavigate, useLocation, matchPath } from 'react-router-dom';
-import { useTypeCookie } from 'shared/hooks/useTypeCookie';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { useMemo, type ReactNode } from 'react';
+import {
+    Routes,
+    Route,
+    Outlet,
+    useNavigate,
+    useLocation,
+    matchPath,
+    HashRouter,
+} from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { isKiosk } from 'shared/isKiosk';
+import { type ReactNode } from 'react';
 import { Header, type HeaderProps } from 'shared/ui/Header';
 import { MainScreen } from './MainScreen';
 import { QuestionScreen } from './QuestionScreen';
@@ -51,34 +59,16 @@ const routes: AppRoute[] = [
     },
 ];
 
-const REDIRECT_TO_PRESC = ['/', '/quest', '/type_result'];
-
 const Layout = () => {
-  const location = useLocation();
-  const { pathname } = location;
+  const { pathname } = useLocation();
   const current = routes.find((r) => matchPath(r.path, pathname));
   const { left, reset } = useIdleTimer(pathname !== '/');
-  const { cookie } = useTypeCookie();
-  const hasType = /^[1-8]$/.test(String(cookie.type));
-
-  const redirectType = useMemo(
-    () =>
-      hasType && REDIRECT_TO_PRESC.includes(pathname) && !location.state?.fromAnalyze
-        ? cookie.type
-        : null,
-    [location.key],
-  );
-
-  if (redirectType) {
-    return <Navigate to={`/presc?type=${redirectType}`} replace />;
-  }
 
   return (
     <>
         <Header
           title={current?.title}
           type={current?.type}
-          hideHome={pathname === '/presc' && hasType}
         />
         <Outlet />
         {left !== null && (
@@ -108,6 +98,8 @@ const Navigator = () => {
     </>
   );
 };
+
+const Router = isKiosk ? HashRouter : BrowserRouter;
 
 const RootRouter = () => {
   return (

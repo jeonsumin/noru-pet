@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useResultType } from 'shared/hooks/useResultType';
 import { images } from 'shared/images';
 
-const ANALYZE_DURATION = 2500;
+const ANALYZE_DURATION = 1500;
 
 export const AnalyzeScreen = () => {
     const { type, popup } = useResultType();
@@ -13,7 +13,7 @@ export const AnalyzeScreen = () => {
         if (type === null) return;
 
         const timer = setTimeout(
-            () => navigate(`/type_result?type=${type}`, { replace: true, state: { fromAnalyze: true } }),
+            () => navigate(`/type_result?type=${type}`, { replace: true }),
             ANALYZE_DURATION,
         );
         return () => clearTimeout(timer);

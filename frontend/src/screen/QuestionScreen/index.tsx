@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { questionList } from 'shared/data/questions';
 import { images } from 'shared/images';
 import { isKiosk } from 'shared/isKiosk';
-import { useTypeCookie } from 'shared/hooks/useTypeCookie';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const NEXT_DELAY = 500;
@@ -22,7 +21,6 @@ export const QuestionScreen = () => {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number[]>([]);
   const navigate = useNavigate();
-  const { createCookie } = useTypeCookie();
 
   const question = questionList[index];
   const step = index + 1;
@@ -77,7 +75,6 @@ export const QuestionScreen = () => {
     const resultType = TYPE_TABLE[area][activeCount >= 2 ? 'active' : 'calm'];
     data.Result = 'TYPE0' + resultType;
     saveSurvey(data);
-    createCookie(String(resultType));
     timer.current = setTimeout(() => navigate(`/analyze?type=${resultType}`), NEXT_DELAY);
 
   };

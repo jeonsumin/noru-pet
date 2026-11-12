@@ -35,17 +35,20 @@ export const QuestionScreen = () => {
 
   const saveSurvey = (data: Record<string, string>) => {
     saving.current = saving.current
-      .then(() =>
-        axios.post<{ ID: number }>(`http://localhost:8000/survey.php`, {
-          ...data,
-          ID: surveyId.current,
-          ChannelType: isKiosk ? 'KIOSK' : 'WEB',
-        }),
-      )
-      .then(({ data: res }) => {
-        surveyId.current = res.ID;
-      })
-      .catch((e) => console.error(e));
+        .then(() =>
+            axios.post<{ ID: number }>(
+                `${import.meta.env.VITE_APP_API_URL || 'http://localhost:8000'}/survey.php`,
+                {
+                    ...data,
+                    ID: surveyId.current,
+                    ChannelType: isKiosk ? 'KIOSK' : 'WEB',
+                }
+            )
+        )
+        .then(({ data: res }) => {
+            surveyId.current = res.ID;
+        })
+        .catch((e) => console.error(e));
   };
 
   const onSelect = (optionIndex: number) => {

@@ -3,7 +3,7 @@ include_once('./_common.php');
 
 $allDataSql = "SELECT COUNT(*) AS CNT FROM surveyList sl WHERE 1=1";
 
-$surveySuccess = "SELECT COUNT(*) AS CNT FROM surveyList sl WHERE Result IS NOT NULl";
+$surveySuccess = "SELECT COUNT(*) AS CNT FROM surveyList sl WHERE Result <> ''";
 
 $typeSql = "SELECT count(case when sl.ChannelType = 'KIOSK' then 1 end) as KIOSK_CNT, count(case when sl.ChannelType = 'WEB' then 1 end) as WEB_CNT FROM surveyList sl WHERE 1=1 ";
 
@@ -12,19 +12,19 @@ $resultSql = "SELECT
                   T.Result,
                   COUNT(sl.Result) AS TYPE_CNT
               FROM (
-                  SELECT 'TYPE1' AS Result UNION ALL
-                  SELECT 'TYPE2' UNION ALL
-                  SELECT 'TYPE3' UNION ALL
-                  SELECT 'TYPE4' UNION ALL
-                  SELECT 'TYPE5' UNION ALL
-                  SELECT 'TYPE6' UNION ALL
-                  SELECT 'TYPE7' UNION ALL
-                  SELECT 'TYPE8'
+                  SELECT 'TYPE01' AS Result UNION ALL
+                  SELECT 'TYPE02' UNION ALL
+                  SELECT 'TYPE03' UNION ALL
+                  SELECT 'TYPE04' UNION ALL
+                  SELECT 'TYPE05' UNION ALL
+                  SELECT 'TYPE06' UNION ALL
+                  SELECT 'TYPE07' UNION ALL
+                  SELECT 'TYPE08'
               ) T
               LEFT JOIN surveyList sl
                   ON T.Result = sl.Result WHERE 1=1 " ;
 
-if (isset($_GET['date'])) {
+if (isset($_GET['date']) && $_GET['date'] !== 'all') {
     $date_where = " AND DATE(sl.CreatedAt) = '". $date . "'";
 
     $surveySuccess .= $date_where;
@@ -42,60 +42,54 @@ $allDataDate = rf_mysql_row($allDataSql, $DB);
 $surveySuccessData = rf_mysql_row($surveySuccess, $DB);
 $typeDate = rf_mysql_arr($typeSql, $DB);
 $resultDate = rf_mysql_arr($resultSql, $DB);
+//비율
+$typeTotal = array_sum(array_column($resultDate, 'TYPE_CNT'));
+$total = (int)$allDataDate['CNT'];
+$doneRate = $total ? round($surveySuccessData['CNT'] / $total * 100, 1) : 0;
+$KioskRate = $total ? round($typeDate[0]['KIOSK_CNT'] / $total * 100, 1) : 0;
+$webRate = $total ? round($typeDate[0]['WEB_CNT'] / $total * 100, 1) : 0;
 
-function types($value) {
-    return match($value) {
-        "TYPE1" => [
-            "title" => "미끄러지는 개구쟁이",
-            "area" => "미끄럼방지",
-            "recommend" => "논슬립 펫",
-            "mbti" => "활동형"
-        ],
-        "TYPE2" => [
-            "title" => "미끄러지는 개구쟁이",
-            "area" => "미끄럼방지",
-            "recommend" => "논슬립 펫",
-            "mbti" => "활동형"
-        ],
-        "TYPE3" => [
-            "title" => "미끄러지는 개구쟁이",
-            "area" => "미끄럼방지",
-            "recommend" => "논슬립 펫",
-            "mbti" => "활동형"
-        ],
-        "TYPE4" => [
-            "title" => "미끄러지는 개구쟁이",
-            "area" => "미끄럼방지",
-            "recommend" => "논슬립 펫",
-            "mbti" => "활동형"
-        ],
-        "TYPE5" => [
-            "title" => "미끄러지는 개구쟁이",
-            "area" => "미끄럼방지",
-            "recommend" => "논슬립 펫",
-            "mbti" => "활동형"
-        ],
-        "TYPE6" => [
-            "title" => "미끄러지는 개구쟁이",
-            "area" => "미끄럼방지",
-            "recommend" => "논슬립 펫",
-            "mbti" => "활동형"
-        ],
-        "TYPE7" => [
-            "title" => "미끄러지는 개구쟁이",
-            "area" => "미끄럼방지",
-            "recommend" => "논슬립 펫",
-            "mbti" => "활동형"
-        ],
-        "TYPE8" => [
-            "title" => "미끄러지는 개구쟁이",
-            "area" => "미끄럼방지",
-            "recommend" => "논슬립 펫",
-            "mbti" => "활동형"
-        ],
-        default => []
-    };
+
+// 엑셀
+if (($_GET['export'] ?? '') === 'xlsx') {
+    error_reporting(E_ALL & ~E_DEPRECATED);
+    require_once __DIR__ . '/../phpoffice/vendor/autoload.php';
+
+    $rows = [
+        ['기간', isset($_GET['date']) && $_GET['date'] !== 'all' ? $_GET['date'] : '전체 기간'],
+        [],
+        ['항목', '인원 (명)', '비율 (%)'],
+        ['총 참여', $total, null],
+        ['검진 완료', (int)$surveySuccessData['CNT'], $doneRate],
+        ['키오스크 참여', (int)$typeDate[0]['KIOSK_CNT'], $KioskRate],
+        ['모바일 웹 참여', (int)$typeDate[0]['WEB_CNT'], $webRate],
+        [],
+        ['TYPE', '유형명', '영역', '추천 제품', '성향', '인원 (명)', '비율 (%)'],
+    ];
+    foreach ($resultDate as $value) {
+        $type = types($value['Result']);
+        $rows[] = [$value['Result'], $type['title'], $type['area'], $type['recommend'], $type['mbti'], (int)$value['TYPE_CNT'], $typeTotal ? round($value['TYPE_CNT'] / $typeTotal * 100, 1) : 0];
+    }
+    $rows[] = ['합계', null, null, null, null, $typeTotal, 100];
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setTitle('대시보드');
+    $sheet->fromArray($rows, null, 'A1');
+    foreach (range('A', 'G') as $col) {
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $fileDate = isset($_GET['date']) && $_GET['date'] !== 'all' ? $_GET['date'] : 'all';
+    header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode("noroo-wa-dashboard_{$fileDate}.xlsx"));
+    (new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet))->save('php://output');
+    exit;
 }
+
 
 ?>
 <!doctype html>
@@ -112,8 +106,8 @@ function types($value) {
     <div class="app-shell">
       <aside class="sidebar">
         <a class="brand" href="index.html" aria-label="NOROO WA 홈">
-          <strong>NOROO<br />WA</strong>
-          <span>펫 안전 캠페인 · Admin</span>
+          <strong>NOROOWA</strong>
+          <span>펫 안전 검진존 · Admin</span>
         </a>
 
         <nav class="navigation" aria-label="주 메뉴">
@@ -145,17 +139,21 @@ function types($value) {
             <h1>대시보드</h1>
             <p class="updated">집계 기준 <span id="updated-at">2026.11.21 17:50</span> · 5분마다 자동 갱신</p>
           </div>
-          <button class="export-button" id="export-csv" type="button">
+          <button class="export-button" id="export-xlsx" type="button">
             <span aria-hidden="true">↓</span> 엑셀 다운로드
           </button>
         </header>
 
         <section class="filters" aria-label="조회 기간">
           <div class="date-tabs" role="group" aria-label="조회 날짜 선택">
-            <button class="date-tab is-selected" type="button" data-date="all" aria-pressed="true">전체 기간</button>
-            <button class="date-tab" type="button" data-date="2026-11-20" aria-pressed="false">11.20 (금)</button>
-            <button class="date-tab" type="button" data-date="2026-11-21" aria-pressed="false">11.21 (토)</button>
-            <button class="date-tab" type="button" data-date="2026-11-22" aria-pressed="false">11.22 (일)</button>
+            <?php
+            $selDate = $_GET['date'] ?? 'all';
+            $dateTabs = ['all' => '전체 기간', '2026-11-20' => '11.20 (금)', '2026-11-21' => '11.21 (토)', '2026-11-22' => '11.22 (일)'];
+            foreach ($dateTabs as $value => $label) {
+                $on = $selDate === $value;
+            ?>
+                <button class="date-tab<?php echo $on ? ' is-selected' : ''; ?>" type="button" data-date="<?php echo $value; ?>" aria-pressed="<?php echo $on ? 'true' : 'false'; ?>"><?php echo $label; ?></button>
+            <?php } ?>
           </div>
           <p class="filter-hint">날짜를 선택하면 해당 일자 기준으로 바뀝니다</p>
         </section>
@@ -166,23 +164,23 @@ function types($value) {
             <div class="metric-value"><?= $allDataDate['CNT'] ?><small>명</small></div>
             <span class="metric-note">검진 시작 기준</span>
           </article>
-          <article class="metric-card" data-progress="80.4">
+          <article class="metric-card">
             <p>검진 완료</p>
             <div class="metric-value"><?= $surveySuccessData['CNT'] ?><small>명</small></div>
-            <span class="metric-note">완료율 <b>80.4%</b></span>
-            <div class="progress"><span style="width:80.4%"></span></div>
+            <span class="metric-note">완료율 <b><?= $doneRate ?>%</b></span>
+            <div class="progress"><span style="width:<?= $doneRate ?>%"></span></div>
           </article>
-          <article class="metric-card" data-progress="62">
+          <article class="metric-card">
             <p>키오스크 참여</p>
             <div class="metric-value"> <?= $typeDate[0]['KIOSK_CNT'] ?> <small>명</small></div>
-            <span class="metric-note">총 참여 대비 <b>62.0%</b></span>
-            <div class="progress"><span style="width:62%"></span></div>
+            <span class="metric-note">총 참여 대비 <b><?= $KioskRate ?>%</b></span>
+            <div class="progress"><span style="width:<?= $KioskRate ?>%"></span></div>
           </article>
-          <article class="metric-card" data-progress="38">
+          <article class="metric-card">
             <p>모바일 웹 참여</p>
             <div class="metric-value"><?= $typeDate[0]['WEB_CNT'] ?><small>명</small></div>
-            <span class="metric-note">총 참여 대비 <b>38.0%</b></span>
-            <div class="progress"><span style="width:38%"></span></div>
+            <span class="metric-note">총 참여 대비 <b><?= $webRate ?>%</b></span>
+            <div class="progress"><span style="width:<?= $webRate ?>%"></span></div>
           </article>
         </section>
 
@@ -195,28 +193,38 @@ function types($value) {
             <table>
               <thead>
                 <tr>
-                  <th scope="col">TYPE</th><th scope="col">유형명</th><th scope="col">영역</th>
-                  <th scope="col">추천 제품</th><th scope="col">성향</th><th scope="col">인원 (명)</th><th scope="col">비율</th>
+                  <th scope="col">TYPE</th>
+                  <th scope="col" class="left">유형명</th>
+                  <th scope="col">영역</th>
+                  <th scope="col">추천 제품</th>
+                  <th scope="col">성향</th>
+                  <th scope="col">인원 (명)</th>
+                  <th scope="col">비율</th>
                 </tr>
               </thead>
               <tbody id="results-body">
-                 <?php foreach ($resultDate as $value) { ?>
+                 <?php foreach ($resultDate as $value) {
+                    $color = type_color($value['Result']);
+                 ?>
                     <tr>
-                        <td class="type type-green"><?= $value['Result'] ?></td>
+                        <td class="type type-<?= $color ?>"><?= $value['Result'] ?></td>
                         <td><?= types($value['Result'])['title']?> </td>
                         <td>
-                            <span class="tag tag-green">미끄럼방지</span>
+                            <span class="tag tag-<?= $color ?>"><?= types($value['Result'])['area']?></span>
                         </td>
-                    <td>논슬립 펫</td>
-                    <td>활동형</td>
-                    <td class="number"></td>
-                    <td class="number">21.0%</td>
+                        <td><?= types($value['Result'])['recommend']?></td>
+                        <td><?= types($value['Result'])['mbti']?></td>
+                        <td class="number"><?= $value['TYPE_CNT']?></td>
+                        <td class="number"><?= $typeTotal ? round($value['TYPE_CNT'] / $typeTotal * 100, 1) : 0 ?>%</td>
                     </tr>
 
                  <?php  }?>
               </tbody>
               <tfoot>
-                <tr><th colspan="5" scope="row">합계</th><td class="number">1,032</td><td class="number">100%</td></tr>
+                <tr>
+                    <th colspan="5" scope="row">합계</th>
+                    <td class="number"><?= number_format($typeTotal) ?></td>
+                    <td class="number">100%</td></tr>
               </tfoot>
             </table>
           </div>

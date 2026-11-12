@@ -1,6 +1,6 @@
 .data-toolbar { min-height: 56px; margin-top: 9px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .select-filters { display: flex; gap: 8px; }
-.select-filters select { height: 29px; padding: 0 23px 0 10px; border: 1px solid var(--line); border-radius: 7px; color: #554740; background: #fff; font: inherit; font-size: 9px; cursor: pointer; }
+.select-filters select { height: 29px; padding: 0 23px 0 10px; border: 1px solid var(--line); border-radius: 7px; color: #554740; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23554740' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 9px center / 8px 5px; -webkit-appearance: none; appearance: none; font: inherit; font-size: 9px; cursor: pointer; }
 .data-card { margin-top: 1px; padding: 15px 17px 11px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
 .data-summary { height: 20px; margin: 0 0 5px; display: flex; align-items: baseline; gap: 8px; font-size: 9px; }
 .data-summary strong { font-size: 11px; }
@@ -24,7 +24,7 @@
 @media (min-width: 1600px) {
   .data-toolbar { min-height: 72px; margin-top: 12px; }
   .select-filters { gap: 10px; }
-  .select-filters select { height: 39px; padding: 0 27px 0 13px; font-size: 12px; }
+  .select-filters select { height: 39px; padding: 0 30px 0 13px; background-position: right 12px center; background-size: 10px 6px; font-size: 12px; }
   .data-card { padding: 21px 22px 15px; border-radius: 15px; }
   .data-summary { height: 27px; margin-bottom: 8px; gap: 11px; font-size: 12px; }
   .data-summary strong { font-size: 15px; }

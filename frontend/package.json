@@ -1,7 +1,7 @@
 {
-    "name": "noru-pet",
+    "name": "noru_pet",
     "private": true,
-    "version": "1.0.0",
+    "version": "0.0.0",
     "main": "electron/electron.js",
     "scripts": {
         "dev": "vite --mode dev",
@@ -15,7 +15,6 @@
         "build:for:electron": "cross-env ELECTRON=true vite build --mode prod",
         "electron:builder": "electron-builder",
         "build:electron": "npm run build:for:electron && npm run electron:builder",
-        "dist:win": "npm run build && electron-builder --win",
         "app:build": "npm run build && npm run build:electron",
         "format": "prettier --write --cache ."
     },
@@ -38,8 +37,8 @@
         "@types/react": "^19.3.0",
         "@types/react-dom": "^19.3.0",
         "@vitejs/plugin-react": "^6.1.2",
-        "electron": "^45.2.1",
-        "electron-builder": "^26.18.0",
+        "electron": "41.2.2",
+        "electron-builder": "26.8.1",
         "electron-is-dev": "^3.0.1",
         "eslint": "^10.14.0",
         "eslint-plugin-react-hooks": "^7.1.1",

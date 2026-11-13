@@ -12,7 +12,6 @@ const AutoLaunch = require('auto-launch');
 
 const autoLauncher = new AutoLaunch({
   name: 'noru_pet', // 앱 이름으로 변경
-
   path: app.getPath('exe'), // 실행 파일 경로
 });
 
@@ -45,14 +44,14 @@ async function createWindow() {
     width: 1080,
     height: 1920,
     fullscreen: !isDev, // 개발 모드에서는 전체화면 해제
-    kiosk: !isDev, // 개발 모드에서는 키오스크 모드 해제
+    kiosk: true, // 개발 모드에서는 키오스크 모드 해제
     frame: isDev, // 개발 모드에서는 프레임 표시
     autoHideMenuBar: !isDev, // 개발 모드에서는 메뉴바 표시
     alwaysOnTop: !isDev, // 개발 모드에서는 항상 최상위 해제
     closable: true, // 개발 모드에서는 닫기 버튼 활성화
     minimizable: isDev, // 개발 모드에서는 최소화 버튼 활성화
     maximizable: isDev, // 개발 모드에서는 최대화 버튼 활성화
-    resizable: isDev, // 개발 모드에서는 크기 조절 활성화
+    resizable: false, // 개발 모드에서는 크기 조절 활성화
     movable: isDev, // 개발 모드에서는 창 이동 활성화
     webPreferences: {
       webSecurity: false, // 개발 중에만 사용

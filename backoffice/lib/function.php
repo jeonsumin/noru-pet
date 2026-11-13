@@ -239,6 +239,11 @@
     }
 
 
+    function php_history_back()
+    {
+        echo "<script>history.back();</script>";
+    }
+
     function php_location($url)
     {
         echo "<script>document.location.href='" . $url . "';</script>";
@@ -272,4 +277,62 @@
         $_SESSION[$session_name] = $value;
     }
 
+    //Type item
+    function types($value) {
+            return match($value) {
+                "TYPE01" => [
+                    "title" => "미끄러지는 개구쟁이",
+                    "area" => "미끄럼방지",
+                    "recommend" => "논슬립 펫",
+                    "mbti" => "활동형"
+                ],
+                "TYPE02" => [
+                    "title" => "조심조심 산책가",
+                    "area" => "미끄럼방지",
+                    "recommend" => "논슬립 펫",
+                    "mbti" => "차분형"
+                ],
+                "TYPE03" => [
+                    "title" => "가구 파괴자",
+                    "area" => "스크래치방지",
+                    "recommend" => "바니쉬 펫",
+                    "mbti" => "활동형"
+                ],
+                "TYPE04" => [
+                    "title" => "긁적긁적 장난꾸러기",
+                    "area" => "스크래치방지",
+                    "recommend" => "바니쉬 펫",
+                    "mbti" => "차분형"
+                ],
+                "TYPE05" => [
+                    "title" => "얼룩 남기는 탐험가",
+                    "area" => "오염방지",
+                    "recommend" => "이지케어 펫",
+                    "mbti" => "활동형"
+                ],
+                "TYPE06" => [
+                    "title" => "실수 잦은 순둥이",
+                    "area" => "오염방지",
+                    "recommend" => "이지케어 펫",
+                    "mbti" => "차분형"
+                ],
+                "TYPE07" => [
+                    "title" => "영역 표시 대장",
+                    "area" => "냄새케어",
+                    "recommend" => "프레쉬 펫",
+                    "mbti" => "활동형"
+                ],
+                "TYPE08" => [
+                    "title" => "꼬순내 뿜뿜 단짝",
+                    "area" => "냄새케어",
+                    "recommend" => "프레쉬 펫",
+                    "mbti" => "차분형"
+                ],
+                default => []
+            };
+    }
 
+    function type_color($result)
+    {
+        return ['green', 'gold', 'blue', 'purple'][intdiv((int)substr($result, 4) - 1, 2)] ?? 'green';
+    }

@@ -20,8 +20,8 @@ $loginCheck =  _BB_ADMIN_URL_PATH."/login.check.php";
     <main class="login-layout">
       <section class="login-panel" aria-labelledby="login-title">
         <a class="login-brand" href="index.html" aria-label="NOROO WA 대시보드">
-          <span class="login-logo">NOROO<br />WA</span>
-          <span class="login-brand-copy">펫 안전 캠페인 <i></i> Admin</span>
+          <span class="login-logo">NOROOWA</span>
+          <span class="login-brand-copy">펫 안전 검진존 <i></i> Admin</span>
         </a>
 
         <div class="login-content">
@@ -32,7 +32,7 @@ $loginCheck =  _BB_ADMIN_URL_PATH."/login.check.php";
           <h1 id="login-title">관리자 접속</h1>
           <p class="login-description">관리자 접근 코드를 입력해 주세요.</p>
 
-          <form id="access-form" action="<? echo $loginCheck ?>" method="POST">
+          <form id="access-form" action="<?php echo $loginCheck ?>" method="POST">
             <label for="access-code">접근 코드</label>
             <input
              id="access-code"

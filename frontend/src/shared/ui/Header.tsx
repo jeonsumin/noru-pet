@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { images } from 'shared/images';
 import { isKiosk } from 'shared/isKiosk';
@@ -15,12 +15,27 @@ export const Header = ({title, type}:HeaderProps) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [exitOpen, setExitOpen] = useState(false);
+  const tapCount = useRef(0);
+  const tapTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const onLogoTap = () => {
+    if (!isKiosk) return;
+    clearTimeout(tapTimer.current);
+    tapCount.current += 1;
+    if (tapCount.current >= 5) {
+      tapCount.current = 0;
+      setExitOpen(true);
+      return;
+    }
+    tapTimer.current = setTimeout(() => { tapCount.current = 0; }, 1000);
+  };
 
   return (
     <header>
       <div className={clsx('header', type)}>
         <div className='logo_box'>
-          <img src={images.logo} alt='logo' />
+          <img src={images.logo} alt='logo' onClick={onLogoTap} />
           {title && <div className='logo_title'>{title}</div>}
         </div>
         {type === 'quest' && (
@@ -37,6 +52,16 @@ export const Header = ({title, type}:HeaderProps) => {
           buttons={[
             { text: '그만하기', bgColor: 'white', onClick: () => { setConfirmOpen(false); navigate('/'); } },
             { text: '계속하기', onClick: () => setConfirmOpen(false) },
+          ]}
+        />
+      )}
+      {exitOpen && (
+        <Popup
+          icon='alert'
+          title='앱을 종료하시겠습니까?'
+          buttons={[
+            { text: '종료하기', bgColor: 'white', onClick: () => window.baseAPI?.closeWindow() },
+            { text: '취소', onClick: () => setExitOpen(false) },
           ]}
         />
       )}

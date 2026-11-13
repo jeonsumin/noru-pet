@@ -1,3 +1,64 @@
+<?php
+    include_once('./_common.php');
+    //정렬
+    $sort = ($_GET['sort'] ?? '') === 'old' ? 'old' : 'new';
+
+    //리스트 갯수
+    $size = in_array((int)($_GET['size'] ?? 20), [20, 50, 100]) ? (int)($_GET['size'] ?? 20) : 20;
+
+    //페이지네이션
+    $page = max(1, (int)($_GET['page'] ?? 1));
+
+    //전체 리스트
+    $allDataListSql = "SELECT * FROM surveyList sl WHERE 1=1";
+
+    //전체 데이터 갯수
+    $dataTotalSql = "SELECT COUNT(*) AS CNT FROM surveyList sl WHERE 1=1";
+
+    if (isset($_GET['date']) && $_GET['date'] !== 'all') {
+        $date_where = " AND DATE(sl.CreatedAt) = '". $date . "'";
+
+        $allDataListSql .= $date_where;
+        $dataTotalSql .= $date_where;
+    }
+
+    $allDataListSql .= $sort === 'old' ? " ORDER BY sl.CreatedAt ASC" : " ORDER BY sl.CreatedAt DESC";
+
+    //엑셀
+    if (($_GET['export'] ?? '') === 'xlsx') {
+        error_reporting(E_ALL & ~E_DEPRECATED);
+        require_once __DIR__ . '/../phpoffice/vendor/autoload.php';
+
+        $rows = [['No', '참여 일시', '채널', 'Q1', 'Q2', 'Q3', 'Q4', '결과 TYPE', '유형명', '완료 여부']];
+        foreach (rf_mysql_arr($allDataListSql, $DB) as $idx => $value) {
+            $done = !empty($value['Result']);
+            $rows[] = [$idx + 1, $value['CreatedAt'], $value['ChannelType'], $value['Q1'], $value['Q2'], $value['Q3'], $value['Q4'], $value['Result'], $done ? types($value['Result'])['title'] : '', $done ? '완료' : '미완료'];
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('참여자 데이터');
+        $sheet->fromArray($rows, null, 'A1');
+        foreach (range('A', 'J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $fileDate = isset($_GET['date']) && $_GET['date'] !== 'all' ? $_GET['date'] : '전체기간';
+        header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode("noroo-wa-participants_{$fileDate}.xlsx"));
+        (new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet))->save('php://output');
+        exit;
+    }
+
+    $allDataListSql .= " LIMIT " . $size . " OFFSET " . (($page - 1) * $size);
+    $dataTotalData = rf_mysql_row($dataTotalSql, $DB);
+    $lastPage = max(1, (int)ceil($dataTotalData['CNT'] / $size));
+    $allDataDate = rf_mysql_arr($allDataListSql, $DB);
+?>
+
 <!doctype html>
 <html lang="ko">
   <head>
@@ -7,13 +68,14 @@
     <title>참여자 데이터 | NOROO WA</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/data.css" />
+    <script src="js/app.js" defer></script>
     <script src="js/data.js" defer></script>
   </head>
   <body>
     <div class="app-shell">
       <aside class="sidebar">
         <a class="brand" href="dashboard.php" aria-label="NOROO WA 홈">
-          <strong>NOROO<br />WA</strong>
+          <strong>NOROOWA</strong>
           <span>펫 안전 캠페인 · Admin</span>
         </a>
         <nav class="navigation" aria-label="주 메뉴">
@@ -38,56 +100,93 @@
             <h1>참여자 데이터</h1>
             <p class="updated">참여 1건 = 1명 (참여 ID 기준) · 개인 식별 정보는 수집하지 않습니다</p>
           </div>
-          <button class="export-button" id="export-csv" type="button"><span aria-hidden="true">↓</span> 엑셀 다운로드</button>
+          <button class="export-button" id="export-xlsx" type="button"><span aria-hidden="true">↓</span> 엑셀 다운로드</button>
         </header>
 
         <section class="data-toolbar" aria-label="참여자 데이터 필터">
           <div class="date-tabs" role="group" aria-label="참여 날짜 선택">
-            <button class="date-tab" type="button" aria-pressed="false">전체 기간</button>
-            <button class="date-tab" type="button" aria-pressed="false">11.20 (금)</button>
-            <button class="date-tab is-selected" type="button" aria-pressed="true">11.21 (토)</button>
-            <button class="date-tab" type="button" aria-pressed="false">11.22 (일)</button>
+            <?php
+                $selDate = $_GET['date'] ?? 'all';
+                $dateTabs = ['all' => '전체 기간', '2026-11-20' => '11.20 (금)', '2026-11-21' => '11.21 (토)', '2026-11-22' => '11.22 (일)'];
+                foreach ($dateTabs as $value => $label) {
+                    $on = $selDate === $value;
+                ?>
+                    <button class="date-tab<?php echo $on ? ' is-selected' : ''; ?>" type="button" data-date="<?php echo $value; ?>" aria-pressed="<?php echo $on ? 'true' : 'false'; ?>"><?php echo $label; ?></button>
+                <?php } ?>
           </div>
           <div class="select-filters">
             <label class="visually-hidden" for="sort-order">정렬 순서</label>
-            <select id="sort-order"><option>최근 참여순</option><option>오래된 참여순</option></select>
+            <select id="sort-order">
+              <option value="new" <?= $sort === 'new' ? 'selected' : '' ?>>최근 참여순</option>
+              <option value="old" <?= $sort === 'old' ? 'selected' : '' ?>>오래된 참여순</option>
+            </select>
             <label class="visually-hidden" for="page-size">페이지 표시 개수</label>
-            <select id="page-size"><option>20개씩 보기</option><option>50개씩 보기</option><option>100개씩 보기</option></select>
+              <select id="page-size">
+                <?php foreach ([20, 50, 100] as $n) { ?>
+                  <option value="<?= $n ?>" <?= $size === $n ? 'selected' : '' ?>><?= $n ?>개씩 보기</option>
+                <?php } ?>
+              </select>
           </div>
         </section>
 
         <section class="data-card" aria-labelledby="data-title">
-          <h2 class="visually-hidden" id="data-title">11월 21일 참여 결과</h2>
-          <p class="data-summary"><strong>11.21 (토)</strong><span>검색 결과 <b>512건</b></span></p>
+          <p class="data-summary"><strong><?= $dateTabs[$selDate] ?? '전체 기간' ?></strong><span>검색 결과 <b><?= $dataTotalData['CNT'] ?>건</b></span></p>
           <div class="data-table-wrap">
             <table class="participant-table">
-              <thead><tr>
-                <th scope="col">No</th><th scope="col">참여 ID</th><th scope="col">참여 일시</th><th scope="col">채널</th>
-                <th scope="col">Q1</th><th scope="col">Q2</th><th scope="col">Q3</th><th scope="col">Q4</th><th scope="col">결과 TYPE</th><th scope="col">완료 여부</th>
-              </tr></thead>
+              <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">참여 일시</th>
+                    <th scope="col">채널</th>
+                    <th scope="col">Q1</th>
+                    <th scope="col">Q2</th>
+                    <th scope="col">Q3</th>
+                    <th scope="col">Q4</th>
+                    <th scope="col" class="left">결과 TYPE</th>
+                    <th scope="col">완료 여부</th>
+                  </tr>
+            </thead>
               <tbody>
-                <tr><td>512</td><td>K02-1121-0412</td><td>11.21 17:48</td><td>키오스크</td><td>A</td><td>A</td><td>C</td><td>B</td><td><span class="result-type type-green">TYPE 01</span> 미끄러지는 개구쟁이</td><td>완료</td></tr>
-                <tr><td>511</td><td>W-1121-0871</td><td>11.21 17:46</td><td>모바일 웹</td><td>C</td><td>C</td><td>D</td><td>A</td><td><span class="result-type type-blue">TYPE 06</span> 실수 잦은 순둥이</td><td>완료</td></tr>
-                <tr><td>510</td><td>K01-1121-0398</td><td>11.21 17:45</td><td>키오스크</td><td>D</td><td>A</td><td>B</td><td>C</td><td><span class="result-type type-purple">TYPE 07</span> 영역 표시 대장</td><td>완료</td></tr>
-                <tr><td>509</td><td>K03-1121-0377</td><td>11.21 17:44</td><td>키오스크</td><td>B</td><td>A</td><td>—</td><td>—</td><td>—</td><td class="incomplete">미완료</td></tr>
-                <tr><td>508</td><td>W-1121-0869</td><td>11.21 17:41</td><td>모바일 웹</td><td>B</td><td>C</td><td>A</td><td>D</td><td><span class="result-type type-gold">TYPE 04</span> 적극적인 장난꾸러기</td><td>완료</td></tr>
-                <tr><td>507</td><td>K02-1121-0411</td><td>11.21 17:40</td><td>키오스크</td><td>D</td><td>D</td><td>C</td><td>D</td><td><span class="result-type type-purple">TYPE 08</span> 조그난해 뚫똥 단짝</td><td>완료</td></tr>
-                <tr><td>506</td><td>K01-1121-0397</td><td>11.21 17:38</td><td>키오스크</td><td>A</td><td>D</td><td>B</td><td>C</td><td><span class="result-type type-green">TYPE 02</span> 조심조심 산책가</td><td>완료</td></tr>
-                <tr><td>505</td><td>W-1121-0866</td><td>11.21 17:35</td><td>모바일 웹</td><td>C</td><td>B</td><td>A</td><td>A</td><td><span class="result-type type-blue">TYPE 05</span> 열을 남기는 탐험가</td><td>완료</td></tr>
-                <tr><td>504</td><td>K03-1121-0376</td><td>11.21 17:33</td><td>키오스크</td><td>B</td><td>B</td><td>A</td><td>C</td><td><span class="result-type type-gold">TYPE 03</span> 가구 파괴자</td><td>완료</td></tr>
-                <tr><td>503</td><td>K01-1121-0396</td><td>11.21 17:31</td><td>키오스크</td><td>A</td><td>A</td><td>C</td><td>A</td><td><span class="result-type type-green">TYPE 01</span> 미끄러지는 개구쟁이</td><td>완료</td></tr>
-                <tr><td>502</td><td>W-1121-0862</td><td>11.21 17:29</td><td>모바일 웹</td><td>D</td><td>C</td><td>C</td><td>D</td><td><span class="result-type type-purple">TYPE 08</span> 조그난해 뚫똥 단짝</td><td>완료</td></tr>
-                <tr><td>501</td><td>K02-1121-0409</td><td>11.21 17:27</td><td>키오스크</td><td>C</td><td>A</td><td>B</td><td>A</td><td><span class="result-type type-blue">TYPE 05</span> 열을 남기는 탐험가</td><td>완료</td></tr>
-                <tr><td>500</td><td>K03-1121-0375</td><td>11.21 17:26</td><td>키오스크</td><td>A</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="incomplete">미완료</td></tr>
+                    <?php foreach ($allDataDate as $idx => $value) {
+
+                    ?>
+                        <tr>
+                            <td><?= ($page - 1) * $size + $idx + 1 ?></td>
+                            <td class="center"><?= date('m.d H:i', strtotime($value['CreatedAt'])) ?></td>
+                            <td><?= $value['ChannelType']?></td>
+                            <td><?= !empty($value['Q1']) ? $value['Q1'] : '<span class="empty-dash"></span>' ?></td>
+                            <td><?= !empty($value['Q2']) ? $value['Q2'] : '<span class="empty-dash"></span>' ?></td>
+                            <td><?= !empty($value['Q3']) ? $value['Q3'] : '<span class="empty-dash"></span>' ?></td>
+                            <td><?= !empty($value['Q4']) ? $value['Q4'] : '<span class="empty-dash"></span>' ?></td>
+                            <td class="left">
+                                <?php if (empty($value['Result'])) { ?>
+                                <span class="empty-dash"></span>
+                                <?php } else { ?>
+                                <span class="result-type type-<?= type_color($value['Result']) ?>"><?= $value['Result']?></span>
+                                <span><?= types($value['Result'])['title'] ?></span>
+                                <?php } ?>
+                            </td>
+                            <td class="center<?= empty($value['Result']) ? ' is-incomplete' : '' ?>">
+                                <?= empty($value['Result']) ? '미완료' : '완료' ?>
+                            </td>
+                        </tr>
+                    <?php }?>
               </tbody>
             </table>
           </div>
-          <nav class="pagination" aria-label="페이지 이동">
-            <button type="button" aria-label="이전 페이지" disabled>‹</button>
-            <button type="button" class="current" aria-current="page">1</button>
-            <button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button>
-            <span>…</span><button type="button">26</button><button type="button" aria-label="다음 페이지">›</button>
-          </nav>
+              <nav class="pagination" aria-label="페이지 이동">
+                <?php
+                  $start = intdiv($page - 1, 10) * 10 + 1;
+                  $end = min($lastPage, $start + 9);
+                ?>
+                <button type="button" data-page="1" aria-label="첫 페이지" <?= $page <= 1 ? 'disabled' : '' ?>>«</button>
+                <button type="button" data-page="<?= $page - 1 ?>" aria-label="이전 페이지" <?= $page <= 1 ? 'disabled' : '' ?>>‹</button>
+                <?php for ($i = $start; $i <= $end; $i++) { ?>
+                  <button type="button" data-page="<?= $i ?>" <?= $i === $page ? 'class="current" aria-current="page"' : '' ?>><?= $i ?></button>
+                <?php } ?>
+                <button type="button" data-page="<?= $page + 1 ?>" aria-label="다음 페이지" <?= $page >= $lastPage ? 'disabled' : '' ?>>›</button>
+                <button type="button" data-page="<?= $lastPage ?>" aria-label="마지막 페이지" <?= $page >= $lastPage ? 'disabled' : '' ?>>»</button>
+              </nav>
         </section>
       </main>
     </div>

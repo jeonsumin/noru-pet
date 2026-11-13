@@ -9,20 +9,20 @@ dateTabs.forEach((tab) => {
             item.setAttribute('aria-pressed', String(selected));
             target = tab.dataset.date;
         });
-        location.href = "?date=" + target;
+        const params = new URLSearchParams(location.search);
+        params.set('date', target);
+        params.delete('page');
+        location.search = params.toString();
     });
 
 });
 
-document.querySelector('#export-csv').addEventListener('click', () => {
-    const rows = [...document.querySelectorAll('table tr')].map((row) =>
-        [...row.children].map((cell) => `"${cell.innerText.trim().replaceAll('"', '""')}"`).join(','),
-    );
-    const blob = new Blob(['\uFEFF' + rows.join('\r\n')], {type: 'text/csv;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'noroo-wa-dashboard.csv';
-    link.click();
-    URL.revokeObjectURL(url);
+document.querySelector('#export-xlsx')?.addEventListener('click', () => {
+    const params = new URLSearchParams(location.search);
+    params.set('export', 'xlsx');
+    location.href = '?' + params.toString();
+});
+
+document.querySelector('.logout')?.addEventListener('click', () => {
+    location.href = 'logout.php';
 });

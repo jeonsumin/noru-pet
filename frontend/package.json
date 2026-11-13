@@ -1,67 +1,67 @@
 {
-  "name": "application",
-  "private": true,
-  "version": "0.0.0",
-  "main": "electron/electron.js",
-  "scripts": {
-    "dev": "vite --mode dev",
-    "build": "tsc --noEmit && vite build",
-    "serve": "vite preview",
-    "electron": "cross-env IS_DEV=true electron .",
-    "electron:pack": "electron-builder --dir",
-    "electron:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron\"",
-    "start:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron\" ",
-    "start:frontend": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron\"",
-    "build:for:electron": "cross-env ELECTRON=true vite build --mode prod",
-    "electron:builder": "electron-builder",
-    "build:electron": "npm run build:for:electron && npm run electron:builder",
-    "app:build": "npm run build && npm run build:electron",
-    "format": "prettier --write --cache ."
-  },
-  "dependencies": {
-    "@reduxjs/toolkit": "^2.13.0",
-    "auto-launch": "^5.0.6",
-    "axios": "^1.21.0",
-    "clsx": "^2.1.1",
-    "concurrently": "^10.0.6",
-    "cross-env": "^10.1.0",
-    "lottie-web": "^5.13.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "react-redux": "^9.3.1",
-    "react-router-dom": "^7.18.5",
-    "react-spinners": "^0.17.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.2",
-    "electron": "^45.2.1",
-    "electron-builder": "^26.18.0",
-    "electron-is-dev": "^3.0.1",
-    "eslint": "^10.14.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.7",
-    "globals": "^17.14.0",
-    "prettier": "^3.9.10",
-    "typescript": "~7.0.2",
-    "typescript-eslint": "^8.72.1",
-    "vite": "^8.3.5"
-  },
-  "build": {
-    "asar": true,
-    "files": [
-      "dist/",
-      "electron/",
-      "package.json",
-      "src/assets/img/app_icon.ico"
-    ],
-    "win": {
-      "icon": "public/favicon_256x256.png"
+    "name": "noru_pet",
+    "private": true,
+    "version": "0.0.0",
+    "main": "electron/electron.js",
+    "scripts": {
+        "dev": "vite --mode dev",
+        "build": "tsc --noEmit && vite build",
+        "serve": "vite preview",
+        "electron": "cross-env IS_DEV=true electron .",
+        "electron:pack": "electron-builder --dir",
+        "electron:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron\"",
+        "start:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron\" ",
+        "start:frontend": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron\"",
+        "build:for:electron": "cross-env ELECTRON=true vite build --mode prod",
+        "electron:builder": "electron-builder",
+        "build:electron": "npm run build:for:electron && npm run electron:builder",
+        "app:build": "npm run build && npm run build:electron",
+        "format": "prettier --write --cache ."
     },
-    "directories": {
-      "buildResources": "resources"
+    "dependencies": {
+        "@reduxjs/toolkit": "^2.13.0",
+        "auto-launch": "^5.0.6",
+        "axios": "^1.21.0",
+        "clsx": "^2.1.1",
+        "concurrently": "^10.0.6",
+        "cross-env": "^10.1.0",
+        "lottie-web": "^5.13.0",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1",
+        "react-redux": "^9.3.1",
+        "react-router-dom": "^7.18.5",
+        "react-spinners": "^0.17.1"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.3.0",
+        "@vitejs/plugin-react": "^6.1.2",
+        "electron": "41.2.2",
+        "electron-builder": "26.8.1",
+        "electron-is-dev": "^3.0.1",
+        "eslint": "^10.14.0",
+        "eslint-plugin-react-hooks": "^7.1.1",
+        "eslint-plugin-react-refresh": "^0.5.7",
+        "globals": "^17.14.0",
+        "prettier": "^3.9.10",
+        "typescript": "~7.0.2",
+        "typescript-eslint": "^8.72.1",
+        "vite": "^8.3.5"
+    },
+    "build": {
+        "asar": true,
+        "files": [
+            "dist/",
+            "electron/",
+            "package.json",
+            "src/assets/img/app_icon.ico"
+        ],
+        "win": {
+            "icon": "public/favicon_256x256.png"
+        },
+        "directories": {
+            "buildResources": "resources"
+        }
     }
-  }
 }

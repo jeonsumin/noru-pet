@@ -37,7 +37,7 @@ export const QuestionScreen = () => {
     saving.current = saving.current
         .then(() =>
             axios.post<{ ID: number }>(
-                `${import.meta.env.VITE_APP_API_URL || 'http://localhost:8000'}/survey.php`,
+                `${import.meta.env.VITE_APP_API_URL || 'http://localhost:8000'}/survey`,
                 {
                     ...data,
                     ID: surveyId.current,

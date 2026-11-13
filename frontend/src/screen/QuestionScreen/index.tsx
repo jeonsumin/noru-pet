@@ -3,7 +3,8 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { questionList } from 'shared/data/questions';
-import { images } from 'shared/images';
+import { images, preloadImage, typeResultImg } from 'shared/images';
+import { useIsMobile } from 'shared/hooks/useIsMobile';
 import { isKiosk } from 'shared/isKiosk';
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -21,6 +22,7 @@ export const QuestionScreen = () => {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number[]>([]);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const question = questionList[index];
   const step = index + 1;
@@ -32,6 +34,8 @@ export const QuestionScreen = () => {
   const saving = useRef<Promise<void>>(Promise.resolve());
 
   useEffect(() => () => clearTimeout(timer.current), []);
+
+  useEffect(() => preloadImage(isMobile ? images.analysisMo : images.analysis), [isMobile]);
 
   const saveSurvey = (data: Record<string, string>) => {
     saving.current = saving.current
@@ -77,6 +81,7 @@ export const QuestionScreen = () => {
     //  설문별 타입 추가
     const resultType = TYPE_TABLE[area][activeCount >= 2 ? 'active' : 'calm'];
     data.Result = 'TYPE0' + resultType;
+    preloadImage(typeResultImg(resultType, isMobile));
     saveSurvey(data);
     timer.current = setTimeout(() => navigate(`/analyze?type=${resultType}`), NEXT_DELAY);
 

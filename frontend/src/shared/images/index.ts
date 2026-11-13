@@ -41,3 +41,12 @@ export const images = {
     qr_8,
     goods
 };
+
+const typeResultImgs = import.meta.glob<string>('./type_result_*.png', { eager: true, import: 'default' });
+
+export const typeResultImg = (type: number, mobile: boolean) =>
+    typeResultImgs[`./type_result_${mobile ? 'mo_' : ''}${type}.png`];
+
+export const preloadImage = (src: string) => {
+    new Image().src = src;
+};

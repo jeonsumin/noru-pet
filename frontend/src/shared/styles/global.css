@@ -1020,6 +1020,14 @@ footer.line {
         min-height:160px;
         margin-top:16px;
     }
+    .type_result_imgbox.type_1 { background-image:url('../images/type_result_mo_1.png'); }
+    .type_result_imgbox.type_2 { background-image:url('../images/type_result_mo_2.png'); }
+    .type_result_imgbox.type_3 { background-image:url('../images/type_result_mo_3.png'); }
+    .type_result_imgbox.type_4 { background-image:url('../images/type_result_mo_4.png'); }
+    .type_result_imgbox.type_5 { background-image:url('../images/type_result_mo_5.png'); }
+    .type_result_imgbox.type_6 { background-image:url('../images/type_result_mo_6.png'); }
+    .type_result_imgbox.type_7 { background-image:url('../images/type_result_mo_7.png'); }
+    .type_result_imgbox.type_8 { background-image:url('../images/type_result_mo_8.png'); }
     .type_result_card_box::before {
         top:22px;
         left:11px;

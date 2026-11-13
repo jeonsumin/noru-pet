@@ -29,7 +29,10 @@ export const AnalyzeScreen = () => {
                 </div>
                 <div className="analyze_progress"></div>
                 <div className="analyze_content">
-                    <img src={images.analysis} alt='분석 중인 강아지와 노트북' />
+                    <picture>
+                        <source media='(max-width: 768px)' srcSet={images.analysisMo} />
+                        <img src={images.analysis} alt='분석 중인 강아지와 노트북' />
+                    </picture>
                 </div>
                 <div className="analyze_chips">
                     <div className="analyze_chip">미끄럼방지</div>

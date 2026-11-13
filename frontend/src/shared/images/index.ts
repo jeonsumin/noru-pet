@@ -9,6 +9,7 @@ import q3 from './q3.png'
 import q4 from './q4.png'
 import prevArrow from './prev_arrow.svg';
 import analysis from './analysis.gif';
+import analysisMo from './analysis_mo.gif';
 import goods from './goods.png'
 import qr_1 from './qr_type_1.svg';
 import qr_2 from './qr_type_2.svg';
@@ -29,6 +30,7 @@ export const images = {
     q1, q2, q3, q4,
     prevArrow,
     analysis,
+    analysisMo,
     qr_1,
     qr_2,
     qr_3,

@@ -3,7 +3,7 @@ include_once('./_common.php');
 
 $password = $_POST['accessCode'];
 
-$code = "noropet!@";
+$code = "norupet!@";
 
 if( $password != $code) {
     php_alert("비밀번호가 일치하지 않습니다.", "back");

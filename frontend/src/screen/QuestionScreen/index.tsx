@@ -6,6 +6,7 @@ import { questionList } from 'shared/data/questions';
 import { images, preloadImage, typeResultImg } from 'shared/images';
 import { useIsMobile } from 'shared/hooks/useIsMobile';
 import { isKiosk } from 'shared/isKiosk';
+import { Popup } from 'shared/ui/Popup';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const NEXT_DELAY = 500;
@@ -21,6 +22,7 @@ const TYPE_TABLE: Record<string, { active: number; calm: number }> = {
 export const QuestionScreen = () => {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number[]>([]);
+  const [netError, setNetError] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -31,7 +33,7 @@ export const QuestionScreen = () => {
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const surveyId = useRef<number>(undefined);
-  const saving = useRef<Promise<void>>(Promise.resolve());
+  const saving = useRef<Promise<boolean>>(Promise.resolve(true));
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
@@ -51,8 +53,13 @@ export const QuestionScreen = () => {
         )
         .then(({ data: res }) => {
             surveyId.current = res.ID;
+            return true;
         })
-        .catch((e) => console.error(e));
+        .catch((e) => {
+            console.error(e);
+            setNetError(true);
+            return false;
+        });
   };
 
   const onSelect = (optionIndex: number) => {
@@ -69,7 +76,9 @@ export const QuestionScreen = () => {
     clearTimeout(timer.current);
     if (index < total - 1) {
       saveSurvey(data);
-      timer.current = setTimeout(() => setIndex(index + 1), NEXT_DELAY);
+      saving.current.then((ok) => {
+        if (ok) timer.current = setTimeout(() => setIndex(index + 1), NEXT_DELAY);
+      });
       return;
     }
 
@@ -83,7 +92,9 @@ export const QuestionScreen = () => {
     data.Result = 'TYPE0' + resultType;
     preloadImage(typeResultImg(resultType, isMobile));
     saveSurvey(data);
-    timer.current = setTimeout(() => navigate(`/analyze?type=${resultType}`), NEXT_DELAY);
+    saving.current.then((ok) => {
+      if (ok) timer.current = setTimeout(() => navigate(`/analyze?type=${resultType}`), NEXT_DELAY);
+    });
 
   };
 
@@ -159,6 +170,14 @@ export const QuestionScreen = () => {
                 <span>이전</span>
             </button>
           </div>
+          {netError && (
+              <Popup
+                  icon='alert'
+                  title='잠시 후 다시 시도해주세요'
+                  des={<>연결이 불안정해요.<br />관리자에게 문의해주세요</>}
+                  buttons={[{ text: '확인', onClick: () => setNetError(false) }]}
+              />
+          )}
       </main>
   );
 }

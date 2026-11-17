@@ -146,6 +146,11 @@
                   </tr>
             </thead>
               <tbody>
+                    <?php if (empty($allDataDate)) { ?>
+                        <tr>
+                            <td class="center" colspan="9">데이터가 없습니다.</td>
+                        </tr>
+                    <?php } ?>
                     <?php foreach ($allDataDate as $idx => $value) {
 
                     ?>

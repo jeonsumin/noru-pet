@@ -3,13 +3,12 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { questionList } from 'shared/data/questions';
-import { images, preloadImage, typeResultImg } from 'shared/images';
-import { useIsMobile } from 'shared/hooks/useIsMobile';
+import { images } from 'shared/images';
 import { isKiosk } from 'shared/isKiosk';
 import { Popup } from 'shared/ui/Popup';
 
 const pad = (n: number) => String(n).padStart(2, '0');
-const NEXT_DELAY = 500;
+const NEXT_DELAY = 300;
 const LABELS = ['A', 'B', 'C', 'D'];
 
 const TYPE_TABLE: Record<string, { active: number; calm: number }> = {
@@ -23,8 +22,8 @@ export const QuestionScreen = () => {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number[]>([]);
   const [netError, setNetError] = useState(false);
+  const [locked, setLocked] = useState(false);
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
 
   const question = questionList[index];
   const step = index + 1;
@@ -37,7 +36,7 @@ export const QuestionScreen = () => {
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  useEffect(() => preloadImage(isMobile ? images.analysisMo : images.analysis), [isMobile]);
+  useEffect(() => setLocked(false), [index]);
 
   const saveSurvey = (data: Record<string, string>) => {
     saving.current = saving.current
@@ -63,6 +62,8 @@ export const QuestionScreen = () => {
   };
 
   const onSelect = (optionIndex: number) => {
+    if (locked) return;
+    setLocked(true);
     const next = [...selected.slice(0, index), optionIndex];
     setSelected(next);
 
@@ -78,6 +79,7 @@ export const QuestionScreen = () => {
       saveSurvey(data);
       saving.current.then((ok) => {
         if (ok) timer.current = setTimeout(() => setIndex(index + 1), NEXT_DELAY);
+        else setLocked(false);
       });
       return;
     }
@@ -90,10 +92,10 @@ export const QuestionScreen = () => {
     //  설문별 타입 추가
     const resultType = TYPE_TABLE[area][activeCount >= 2 ? 'active' : 'calm'];
     data.Result = 'TYPE0' + resultType;
-    preloadImage(typeResultImg(resultType, isMobile));
     saveSurvey(data);
     saving.current.then((ok) => {
       if (ok) timer.current = setTimeout(() => navigate(`/analyze?type=${resultType}`), NEXT_DELAY);
+      else setLocked(false);
     });
 
   };
@@ -146,6 +148,7 @@ export const QuestionScreen = () => {
                                   'quest_list',
                                   selected[index] === i && 'active'
                               )}
+                              disabled={locked}
                               onClick={() => onSelect(i)}
                           >
                               <div className={clsx('quest_option_type')}>

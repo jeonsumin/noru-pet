@@ -1,6 +1,9 @@
 import { createRoot } from 'react-dom/client';
 import Navigator from './screen/Navigator';
 import 'shared/styles/global.css'
+import { preloadAllImages } from 'shared/images';
+
+preloadAllImages();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');

@@ -42,11 +42,13 @@ export const images = {
     goods
 };
 
-const typeResultImgs = import.meta.glob<string>('./type_result_*.png', { eager: true, import: 'default' });
+const allImages = import.meta.glob<string>('./*.{png,gif,svg}', { eager: true, import: 'default' });
+const preloaded: HTMLImageElement[] = [];
 
-export const typeResultImg = (type: number, mobile: boolean) =>
-    typeResultImgs[`./type_result_${mobile ? 'mo_' : ''}${type}.png`];
-
-export const preloadImage = (src: string) => {
-    new Image().src = src;
+export const preloadAllImages = () => {
+    Object.values(allImages).forEach((src) => {
+        const img = new Image();
+        img.src = src;
+        preloaded.push(img);
+    });
 };

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const IDLE_SEC = 1000;
+const IDLE_SEC = 10;
 const COUNTDOWN_SEC = 10;
 
 

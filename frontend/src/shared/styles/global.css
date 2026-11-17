@@ -324,6 +324,10 @@ footer.line {
     background-color: var(--color4-selected);
     --paw-color: var(--color4-light);
 }
+.quest_list:disabled {
+    opacity: 1;
+    cursor: default;
+}
 .quest_list.active {
     border-color:transparent;
 }

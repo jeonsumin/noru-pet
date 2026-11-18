@@ -62,7 +62,7 @@ const routes: AppRoute[] = [
 const Layout = () => {
   const { pathname } = useLocation();
   const current = routes.find((r) => matchPath(r.path, pathname));
-  const { left, reset } = useIdleTimer(pathname !== '/');
+  const { left, reset } = useIdleTimer(isKiosk && pathname !== '/', pathname === '/result');
 
   return (
     <>

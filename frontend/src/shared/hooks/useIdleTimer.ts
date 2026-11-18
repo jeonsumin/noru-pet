@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 const IDLE_SEC = 10;
 const COUNTDOWN_SEC = 10;
+const DIRECT_SEC = 20;
 
 
-export const useIdleTimer = (enabled: boolean) => {
+export const useIdleTimer = (enabled: boolean, direct = false) => {
     const navigate = useNavigate();
     const [left, setLeft] = useState<number | null>(null);
     const timer = useRef<number>(undefined);
@@ -13,8 +14,11 @@ export const useIdleTimer = (enabled: boolean) => {
     const reset = useCallback(() => {
         clearTimeout(timer.current);
         setLeft(null);
-        if (enabled) timer.current = window.setTimeout(() => setLeft(COUNTDOWN_SEC), IDLE_SEC * 1000);
-    }, [enabled]);
+        if (!enabled) return;
+        timer.current = direct
+            ? window.setTimeout(() => navigate('/', { replace: true }), DIRECT_SEC * 1000)
+            : window.setTimeout(() => setLeft(COUNTDOWN_SEC), IDLE_SEC * 1000);
+    }, [enabled, direct, navigate]);
 
     useEffect(() => {
         reset();

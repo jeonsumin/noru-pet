@@ -2,9 +2,11 @@ import { Footer } from 'shared/ui/Footer';
 import { images } from 'shared/images';
 import { useResultType } from 'shared/hooks/useResultType';
 import { useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 export const ResultScreen = () => {
     const { type, popup } = useResultType();
+    const left = useOutletContext<number | null>();
     if (type === null) return popup;
 
     useEffect(() => {
@@ -48,7 +50,7 @@ export const ResultScreen = () => {
                     </div>
                 </section>
             </main>
-            <Footer line button={{ text: '처음으로', to: '/' }} />
+            <Footer line button={{ text: '처음으로', to: '/', count: left ?? undefined }} />
         </>
     );
 }

@@ -13,19 +13,16 @@ export const useIdleTimer = (enabled: boolean, direct = false) => {
 
     const reset = useCallback(() => {
         clearTimeout(timer.current);
-        setLeft(null);
-        if (!enabled) return;
-        timer.current = direct
-            ? window.setTimeout(() => navigate('/', { replace: true }), DIRECT_SEC * 1000)
-            : window.setTimeout(() => setLeft(COUNTDOWN_SEC), IDLE_SEC * 1000);
-    }, [enabled, direct, navigate]);
+        setLeft(enabled && direct ? DIRECT_SEC : null);
+        if (enabled && !direct) timer.current = window.setTimeout(() => setLeft(COUNTDOWN_SEC), IDLE_SEC * 1000);
+    }, [enabled, direct]);
 
     useEffect(() => {
         reset();
-        window.addEventListener('pointerdown', reset);
+        window.addEventListener('click', reset);
         return () => {
             clearTimeout(timer.current);
-            window.removeEventListener('pointerdown', reset);
+            window.removeEventListener('click', reset);
         };
     }, [reset]);
 

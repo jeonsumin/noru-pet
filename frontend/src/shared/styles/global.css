@@ -33,6 +33,23 @@ html:has(.main_screen) {
     gap:12px;
     justify-content: center;
 }
+.buttons.has_count {
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    align-items:center;
+}
+.buttons .count {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:72px;
+    height:72px;
+    border:5px solid #FBF5E9;
+    border-radius:50%;
+    font-size:34px;
+    font-weight:800;
+}
 
 
 /* header */

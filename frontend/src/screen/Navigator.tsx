@@ -62,7 +62,8 @@ const routes: AppRoute[] = [
 const Layout = () => {
   const { pathname } = useLocation();
   const current = routes.find((r) => matchPath(r.path, pathname));
-  const { left, reset } = useIdleTimer(isKiosk && pathname !== '/', pathname === '/result');
+  const isResult = pathname === '/result';
+  const { left, reset } = useIdleTimer(isKiosk && pathname !== '/', isResult);
 
   return (
     <>
@@ -70,8 +71,8 @@ const Layout = () => {
           title={current?.title}
           type={current?.type}
         />
-        <Outlet />
-        {left !== null && (
+        <Outlet context={left} />
+        {left !== null && !isResult && (
             <Popup
                 icon={left}
                 title="계속 진행하시겠어요?"
